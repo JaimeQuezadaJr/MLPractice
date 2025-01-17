@@ -10,8 +10,8 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/upload', methods=['POST'])
+def upload():
     file = request.files['file']
     if not file:
         return "No file"
@@ -29,11 +29,29 @@ def predict():
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    # Make predictions
-    y_pred = model.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
+    # Save the model and data for later use
+    app.config['model'] = model
+    app.config['X_columns'] = X.columns.tolist()
 
-    return f"Mean Squared Error: {mse}"
+    # Render the table and input form
+    return render_template('table.html', tables=[sleep_data.to_html(classes='data')], titles=sleep_data.columns.values)
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    model = app.config.get('model')
+    X_columns = app.config.get('X_columns')
+
+    if not model or not X_columns:
+        return "Model not trained or columns not available"
+
+    # Get user input data
+    user_data = [float(request.form[col]) for col in X_columns]
+    user_data = [user_data]  # Convert to 2D array
+
+    # Make prediction
+    prediction = model.predict(user_data)
+
+    return f"Predicted Sleep Score: {prediction[0]}"
 
 if __name__ == '__main__':
     app.run(debug=True)
