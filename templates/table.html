@@ -1,0 +1,35 @@
+<!-- filepath: /Users/jaimequezada/Desktop/Coding Dojo/MLPractice/templates/table.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data and Prediction</title>
+    <style>
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.data th, table.data td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Data</h1>
+    {{ tables|safe }}
+
+    <h2>Predict Sleep Score</h2>
+    <form action="/predict" method="post">
+        {% for col in titles %}
+            {% if col != 'Total Sleep Score' and col != 'date' %}
+                <label for="{{ col }}">{{ col }}:</label>
+                <input type="text" id="{{ col }}" name="{{ col }}"><br><br>
+            {% endif %}
+        {% endfor %}
+        <input type="submit" value="Predict">
+    </form>
+</body>
+</html>
