@@ -34,7 +34,9 @@ def upload():
     app.config['X_columns'] = X.columns.tolist()
 
     # Render the table and input form
-    return render_template('table.html', tables=[sleep_data.to_html(classes='data')], titles=sleep_data.columns.values)
+    table_html = sleep_data.to_html(classes='data').replace('\n', '')
+
+    return render_template('table.html', tables=table_html, titles=sleep_data.columns.values)
 
 @app.route('/predict', methods=['POST'])
 def predict():
