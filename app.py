@@ -3,6 +3,10 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import os
 
 app = Flask(__name__)
 
@@ -32,6 +36,7 @@ def upload():
     # Save the model and data for later use
     app.config['model'] = model
     app.config['X_columns'] = X.columns.tolist()
+    app.config['sleep_data'] = sleep_data  # Save sleep_data in app.config
 
     # Render the table and input form
     table_html = sleep_data.to_html(classes='data').replace('\n', '')
@@ -42,8 +47,9 @@ def upload():
 def predict():
     model = app.config.get('model')
     X_columns = app.config.get('X_columns')
+    sleep_data = app.config.get('sleep_data')
 
-    if not model or not X_columns:
+    if not model or not X_columns or sleep_data is None:
         return "Model not trained or columns not available"
 
     # Get user input data
@@ -51,9 +57,24 @@ def predict():
     user_data = [user_data]  # Convert to 2D array
 
     # Make prediction
-    prediction = model.predict(user_data)
+    prediction = model.predict(user_data)[0]
 
-    return f"Predicted Sleep Score: {prediction[0]}"
+    # Generate the linear regression chart
+    X = pd.DataFrame(user_data, columns=X_columns)
+    y_pred = model.predict(X)
+
+    plt.figure(figsize=(10, 6))
+    plt.scatter(sleep_data[X_columns[2]], sleep_data['Total Sleep Score'], color='gray', label='Original Data')
+    plt.scatter(X.iloc[:, 2], y_pred, color='blue', label='Predicted Data')
+    plt.xlabel(X_columns[2])
+    plt.ylabel('Total Sleep Score')
+    plt.title('Linear Regression Prediction')
+    plt.legend()
+    chart_path = os.path.join('static', 'chart.png')
+    plt.savefig(chart_path)
+    plt.close()
+
+    return render_template('result.html', prediction=prediction, chart_path=chart_path)
 
 if __name__ == '__main__':
     app.run(debug=True)
