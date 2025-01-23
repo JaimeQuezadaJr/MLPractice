@@ -23,7 +23,7 @@ def upload():
     # Read the CSV file
     sleep_data = pd.read_csv(file)
     modified_sleep_data = sleep_data.drop(columns=['date'])
-    X = modified_sleep_data.drop(columns=['Total Sleep Score'])
+    X = modified_sleep_data.drop(columns(['Total Sleep Score']))
     y = modified_sleep_data['Total Sleep Score']
 
     # Split the data
