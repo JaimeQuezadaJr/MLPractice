@@ -41,7 +41,12 @@ def upload():
     # Render the table and input form
     table_html = sleep_data.to_html(classes='data').replace('\n', '')
 
-    return render_template('table.html', tables=table_html, titles=sleep_data.columns.values)
+    # Add hidden-rows class to rows beyond the first 10
+    table_html = table_html.split('</tr>', 11)
+    table_html[10] = table_html[10].replace('<tr', '<tr class="hidden-rows"')
+    table_html = '</tr>'.join(table_html)
+
+    return render_template('table.html', table=table_html, titles=sleep_data.columns.values)
 
 @app.route('/predict', methods=['POST'])
 def predict():
