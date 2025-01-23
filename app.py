@@ -23,7 +23,7 @@ def upload():
     # Read the CSV file
     sleep_data = pd.read_csv(file)
     modified_sleep_data = sleep_data.drop(columns=['date'])
-    X = modified_sleep_data.drop(columns(['Total Sleep Score']))
+    X = modified_sleep_data.drop(columns=['Total Sleep Score'])
     y = modified_sleep_data['Total Sleep Score']
 
     # Split the data
@@ -42,8 +42,9 @@ def upload():
     table_html = sleep_data.to_html(classes='data').replace('\n', '')
 
     # Add hidden-rows class to rows beyond the first 10
-    table_html = table_html.split('</tr>', 11)
-    table_html[10] = table_html[10].replace('<tr', '<tr class="hidden-rows"')
+    table_html = table_html.split('</tr>')
+    for i in range(11, len(table_html)):
+        table_html[i] = table_html[i].replace('<tr', '<tr class="hidden-rows"')
     table_html = '</tr>'.join(table_html)
 
     return render_template('table.html', table=table_html, titles=sleep_data.columns.values)
