@@ -69,15 +69,49 @@ def predict():
     X = pd.DataFrame(user_data, columns=X_columns)
     y_pred = model.predict(X)
 
+    # Set the style for the plot
+    plt.style.use('seaborn-v0_8-white')
     plt.figure(figsize=(10, 6))
-    plt.scatter(sleep_data[X_columns[2]], sleep_data['Total Sleep Score'], color='gray', label='Original Data')
-    plt.scatter(X.iloc[:, 2], y_pred, color='blue', label='Predicted Data')
-    plt.xlabel(X_columns[2])
-    plt.ylabel('Total Sleep Score')
-    plt.title('Linear Regression Prediction')
-    plt.legend()
+    
+    # Create the scatter plot with modern styling
+    plt.scatter(sleep_data[X_columns[2]], sleep_data['Total Sleep Score'], 
+                color='#E8E8ED', 
+                alpha=0.5,
+                s=100,
+                label='Historical Data')
+    
+    plt.scatter(X.iloc[:, 2], y_pred,
+                color='#0071e3',
+                s=150,
+                label='Your Prediction',
+                zorder=5)  # Ensure prediction appears on top
+    
+    # Style the plot
+    plt.xlabel(X_columns[2], fontsize=12, color='#1d1d1f')
+    plt.ylabel('Total Sleep Score', fontsize=12, color='#1d1d1f')
+    plt.title('Sleep Score Prediction', fontsize=14, color='#1d1d1f', pad=20)
+    
+    # Customize grid
+    plt.grid(True, linestyle='--', alpha=0.3)
+    
+    # Customize spines
+    for spine in plt.gca().spines.values():
+        spine.set_color('#d2d2d7')
+        spine.set_linewidth(0.5)
+    
+    # Customize legend
+    plt.legend(frameon=True, facecolor='white', edgecolor='#d2d2d7')
+    
+    # Set background color
+    plt.gca().set_facecolor('white')
+    plt.gcf().set_facecolor('white')
+    
+    # Add padding
+    plt.tight_layout()
+    
+    # Save with high DPI for retina displays
     chart_path = os.path.join('static', 'chart.png')
-    plt.savefig(chart_path)
+    plt.savefig(chart_path, dpi=300, bbox_inches='tight')
     plt.close()
 
     return render_template('result.html', prediction=prediction, chart_path=chart_path)
